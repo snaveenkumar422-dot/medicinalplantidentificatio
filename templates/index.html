@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicinal Plant Identifier</title>
+    <style>
+        /* Combined Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background: url('{{ url_for('static', filename='images/bg image4.png') }}') no-repeat center center fixed;
+            background-size: cover;
+            background-position: center;
+            animation: gradientBG 2s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .header {
+            text-align: center;
+            background-color: rgba(29, 53, 87, 0.9);
+            color: #ffffff;
+            padding: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 80px auto;
+            padding: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 30px;
+            color: #1d3557;
+            font-weight: bold;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        input, select, button {
+            padding: 16px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: 1px solid #d3d3d3;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #457b9d;
+            outline: none;
+            box-shadow: 0 0 10px rgba(69, 123, 157, 0.4);
+        }
+
+        button {
+            font-size: 20px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #007bff; /* Blue color */
+            color: #ffffff;
+            border-radius: 30px;
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3; /* Darker blue for hover */
+            box-shadow: 0 8px 16px rgba(0, 86, 179, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #007bff; /* Blue color */
+            color: #ffffff;
+            border-radius: 30px;
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background-color: #0056b3; /* Darker blue for hover */
+            box-shadow: 0 8px 16px rgba(0, 86, 179, 0.3);
+        }
+
+.results {
+    margin-top: 10px;
+    text-align: center;  /* Centers all text and content inside results */
+    padding: 20px;  /* Reduced padding for a more compact layout */
+    max-width: 900px;  /* Reduced the max width to make the results container smaller */
+    margin-left: auto;  /* Centers the results section horizontally */
+    margin-right: auto;  /* Centers the results section horizontally */
+    background: rgba(248, 249, 250, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.results img {
+    max-width: 90%;  /* Reduced max width of the image */
+    height: auto;
+    margin-top: 20px;
+    border: 5px solid #ddd;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.results ul {
+    list-style-type: disc;  /* Ensures bullet points are displayed */
+    padding-left: 20px;  /* Adds space for the bullets */
+    display: inline-block;  /* Centers the list */
+    text-align: left;  /* Aligns text of each list item to the left */
+    margin: 0 auto;  /* Centers the list container */
+}
+
+.results ul li {
+    font-size: 1.4rem;  /* Reduced font size of the list items */
+    margin-bottom: 8px;  /* Reduced margin between list items */
+    line-height: 1.4;
+    color: #333;  /* Color for readability */
+}
+
+.results h2 {
+    font-size: 2rem;  /* Slightly smaller font size for the heading */
+    color: #1d3557;
+}
+
+.results p, .results ul li {
+    font-size: 1.3rem;  /* Reduced font size for paragraphs and list items */
+}
+
+.results h3 {
+    font-size: 1.8rem;  /* Slightly smaller font size for subheadings */
+    color: #1d3557;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="header">Medicinal Plant Identifier</div>
+    <div class="container">
+        {% if not prediction %}
+        <h1>🌿 Identify Medicinal Plants</h1>
+        <form action="/" method="POST" enctype="multipart/form-data" class="form-box">
+            <div class="form-group">
+                <label for="model">Select Model:</label>
+                <select name="model" id="model" required>
+                    {% for model in models %}
+                        <option value="{{ model }}">{{ model }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="file">Upload Image:</label>
+                <input type="file" name="file" id="file" accept=".jpg, .jpeg, .png" required>
+            </div>
+            <button type="submit" class="btn-primary">Identify</button>
+        </form>
+        {% else %}
+        <div class="results">
+            <h2>Prediction Results</h2>
+            <p><strong>Model:</strong> {{ model_name }}</p>
+            <p><strong>Predicted Class:</strong> {{ prediction }}</p>
+            <p><strong>Confidence:</strong> {{ confidence }}</p>
+            <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded Image">
+            
+            <h3>Benefits of {{ prediction }}</h3>
+            <ul>
+                {% for benefit in benefits %}
+                    <li>{{ benefit }}</li>
+                {% endfor %}
+            </ul>
+
+            <form action="/" method="GET" class="form-box">
+                <button type="submit" class="btn-secondary">Predict Another Image</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
